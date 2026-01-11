@@ -1,6 +1,5 @@
-# Transcription
-openai-whisper>=20231117
-torch>=2.0.0
+# Transcription (MLX for Apple Silicon)
+mlx-whisper>=0.4.0
 
 # Vector database
 chromadb>=0.4.22

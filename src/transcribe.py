@@ -1,15 +1,23 @@
-"""Video transcription using Whisper."""
+"""Video transcription using MLX Whisper (optimized for Apple Silicon)."""
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Optional
-import whisper
+import mlx_whisper
 from tqdm import tqdm
 
 
 # Supported video/audio extensions
 SUPPORTED_EXTENSIONS = {'.mp4', '.mkv', '.avi', '.mov', '.webm', '.mp3', '.wav', '.m4a', '.flac'}
+
+# MLX Whisper model mapping
+MODEL_MAP = {
+    "tiny": "mlx-community/whisper-tiny-mlx",
+    "base": "mlx-community/whisper-base-mlx",
+    "small": "mlx-community/whisper-small-mlx",
+    "medium": "mlx-community/whisper-medium-mlx",
+    "large": "mlx-community/whisper-large-v3-mlx",
+}
 
 
 def get_media_files(path: str) -> list[Path]:
@@ -36,12 +44,13 @@ def get_media_files(path: str) -> list[Path]:
 
 def transcribe_file(
     file_path: Path,
-    model: whisper.Whisper,
+    model_name: str,
     language: Optional[str] = None
 ) -> dict:
-    """Transcribe a single media file."""
-    result = model.transcribe(
+    """Transcribe a single media file using MLX Whisper."""
+    result = mlx_whisper.transcribe(
         str(file_path),
+        path_or_hf_repo=model_name,
         language=language,
         verbose=False
     )
@@ -66,13 +75,13 @@ def transcribe_folder(
     if not files:
         raise ValueError(f"No supported media files found in {folder}")
 
-    print(f"Loading Whisper model: {model_size}")
-    model = whisper.load_model(model_size)
+    model_name = MODEL_MAP.get(model_size, MODEL_MAP["base"])
+    print(f"Using MLX Whisper model: {model_name}")
 
     results = []
     for file_path in tqdm(files, desc="Transcribing"):
         try:
-            result = transcribe_file(file_path, model, language)
+            result = transcribe_file(file_path, model_name, language)
             results.append(result)
 
             # Save individual transcript if output_dir specified
