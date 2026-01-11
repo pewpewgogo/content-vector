@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# Vector database
+.chroma_db/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Transcripts (generated)
+transcripts/
+
+# OS
+.DS_Store
+Thumbs.db
