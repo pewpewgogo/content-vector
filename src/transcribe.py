@@ -12,16 +12,24 @@ from tqdm import tqdm
 SUPPORTED_EXTENSIONS = {'.mp4', '.mkv', '.avi', '.mov', '.webm', '.mp3', '.wav', '.m4a', '.flac'}
 
 
-def get_media_files(folder: str) -> list[Path]:
-    """Get all supported media files from a folder."""
-    folder_path = Path(folder)
-    if not folder_path.exists():
-        raise ValueError(f"Folder does not exist: {folder}")
+def get_media_files(path: str) -> list[Path]:
+    """Get all supported media files from a folder or single file."""
+    file_path = Path(path)
+    if not file_path.exists():
+        raise ValueError(f"Path does not exist: {path}")
 
+    # If it's a single file, return it if supported
+    if file_path.is_file():
+        if file_path.suffix.lower() in SUPPORTED_EXTENSIONS:
+            return [file_path]
+        else:
+            raise ValueError(f"Unsupported file format: {file_path.suffix}")
+
+    # It's a directory, find all media files
     files = []
     for ext in SUPPORTED_EXTENSIONS:
-        files.extend(folder_path.glob(f"*{ext}"))
-        files.extend(folder_path.glob(f"*{ext.upper()}"))
+        files.extend(file_path.glob(f"*{ext}"))
+        files.extend(file_path.glob(f"*{ext.upper()}"))
 
     return sorted(files)
 

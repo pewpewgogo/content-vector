@@ -17,7 +17,7 @@ def cli():
 
 
 @cli.command()
-@click.argument("folder", type=click.Path(exists=True))
+@click.argument("path", type=click.Path(exists=True))
 @click.option("--model", "-m", default="base",
               type=click.Choice(["tiny", "base", "small", "medium", "large"]),
               help="Whisper model size (larger = more accurate but slower)")
@@ -26,9 +26,11 @@ def cli():
 @click.option("--chunk-size", default=1000, help="Chunk size in characters")
 @click.option("--overlap", default=200, help="Overlap between chunks")
 @click.option("--db-path", default=".chroma_db", help="Path to store vector database")
-def ingest(folder: str, model: str, language: str, chunk_size: int, overlap: int, db_path: str):
+def ingest(path: str, model: str, language: str, chunk_size: int, overlap: int, db_path: str):
     """
-    Ingest videos from FOLDER into the vector database.
+    Ingest videos from PATH into the vector database.
+
+    PATH can be a single video file or a folder containing videos.
 
     This will:
     1. Transcribe all video/audio files using Whisper
@@ -40,7 +42,7 @@ def ingest(folder: str, model: str, language: str, chunk_size: int, overlap: int
     from .vectordb import add_chunks, get_stats
 
     # Show what we're processing
-    files = get_media_files(folder)
+    files = get_media_files(path)
     console.print(f"\n[bold]Found {len(files)} media files to process[/bold]\n")
 
     for f in files:
@@ -50,7 +52,7 @@ def ingest(folder: str, model: str, language: str, chunk_size: int, overlap: int
 
     # Transcribe
     with console.status("[bold green]Transcribing videos..."):
-        transcripts = transcribe_folder(folder, model_size=model, language=language)
+        transcripts = transcribe_folder(path, model_size=model, language=language)
 
     console.print(f"[green]✓ Transcribed {len(transcripts)} files[/green]\n")
 
